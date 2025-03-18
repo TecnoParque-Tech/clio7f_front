@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
+import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
 
 const questions = [
-  {
-    text: 'La temperatura de mi lugar de trabajo es adecuada',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'La iluminación en mi lugar de trabajo es adecuada',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Mi lugar de trabajo es cómodo',
-    answers: [1, 2, 3, 4, 5]
-  }
+  { text: 'La temperatura de mi lugar de trabajo es adecuada', answers: [1, 2, 3, 4, 5] },
+  { text: 'La iluminación en mi lugar de trabajo es adecuada', answers: [1, 2, 3, 4, 5] },
+  { text: 'Mi lugar de trabajo es cómodo', answers: [1, 2, 3, 4, 5] }
 ];
 
 const InfoTool = () => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const navigate = useNavigate();
+  const { responses, saveAnswer } = useContext(SurveyContext);
 
   const handleAnswerClick = (questionIndex, answer) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answer
-    });
+    saveAnswer(`Ambiente - ${questions[questionIndex].text}`, answer);
+  };
+
+  const handleNext = () => {
+    const allAnswered = questions.every(q => responses[`Ambiente - ${q.text}`] !== undefined);
+    if (!allAnswered) {
+      alert("Responde todas las preguntas");
+      return;
+    }
+    navigate('/ToolCompensation');
+    window.scrollTo(0, 0);
   };
 
   return (
     <Container>
       <Content>
-      <Tittle>Factores ambientales</Tittle>
+        <Title>Factores ambientales</Title>
         {questions.map((question, index) => (
           <Question key={index}>
             <QuestionText>{question.text}</QuestionText>
@@ -39,7 +39,7 @@ const InfoTool = () => {
                 <Answer
                   key={idx}
                   onClick={() => handleAnswerClick(index, answer)}
-                  selected={selectedAnswers[index] === answer}
+                  selected={responses[`Ambiente - ${question.text}`] === answer}
                 >
                   {answer} - {getAnswerText(answer)}
                 </Answer>
@@ -48,45 +48,30 @@ const InfoTool = () => {
           </Question>
         ))}
       </Content>
-      <Button>
-        <StyledLink to={'/ToolCompensation'}>Siguiente</StyledLink>
-        </Button>
+      <Button onClick={handleNext} disabled={!questions.every(q => responses[`Ambiente - ${q.text}`] !== undefined)}>
+        Siguiente
+      </Button>
     </Container>
   );
 };
 
 const getAnswerText = (answer) => {
   switch (answer) {
-    case 1:
-      return 'Muy en desacuerdo';
-    case 2:
-      return 'En desacuerdo';
-    case 3:
-      return 'Ni de acuerdo ni en desacuerdo';
-    case 4:
-      return 'De acuerdo';
-    case 5:
-      return 'Totalmente de acuerdo';
-    default:
-      return '';
+    case 1: return 'Muy en desacuerdo';
+    case 2: return 'En desacuerdo';
+    case 3: return 'Ni de acuerdo ni en desacuerdo';
+    case 4: return 'De acuerdo';
+    case 5: return 'Totalmente de acuerdo';
+    default: return '';
   }
 };
 
 export default InfoTool;
 
-const Tittle = styled.h1`
+const Title = styled.h1`
   font-size: 2.5rem;
   color: #333;
-  align-items: center;
   text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
-  }
 `;
 
 const Container = styled.div`
@@ -107,14 +92,6 @@ const Content = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 800px;
   width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
 `;
 
 const Question = styled.div`
@@ -148,13 +125,13 @@ const Answer = styled.button`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: ${({ disabled }) => (disabled ? 'lightgray' : 'white')};
+  color: ${({ disabled }) => (disabled ? '#999' : '#666')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: 0.3s;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 200px;
@@ -165,22 +142,7 @@ const Button = styled.button`
   margin-right: auto;
 
   &:hover {
-    background-color: gray;
+    background-color: ${({ disabled }) => (disabled ? 'lightgray' : 'gray')};
     color: white;
   }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 8px 15px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.875rem;
-    padding: 5px 10px;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
 `;

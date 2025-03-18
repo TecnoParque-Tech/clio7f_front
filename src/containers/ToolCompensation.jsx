@@ -1,56 +1,78 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
+import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
 
 const questions = [
   {
-    text: 'Mi salario es atractivo si lo comparo con cargos similares de otras empresas.',
+    text: 'Mi salario es atractivo si lo comparo con cargos similares de otras empresas.',
     answers: [1, 2, 3, 4, 5]
   },
   {
     text: 'Mi salario es inferior si lo comparo con cargos similares de otras empresas.',
-    answers: [1, 2, 3, 4, 5]
+    answers: [1, 2, 3, 4, 5],
+    inverse: true,
   },
   {
-    text: 'El salario que recibo es acorde al trabajo que realizo',
+    text: 'El salario que recibo es acorde al trabajo que realizo.',
     answers: [1, 2, 3, 4, 5]
   }
 ];
 
 const InfoTool = () => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const { responses, saveAnswer } = useContext(SurveyContext);
+  const navigate = useNavigate();
 
   const handleAnswerClick = (questionIndex, answer) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answer
-    });
+    const question = questions[questionIndex];
+
+    // Si la pregunta tiene el campo "inverse", invertir la respuesta
+    const adjustedAnswer = question.inverse ? 6 - answer : answer;
+
+    saveAnswer(`Compensación - ${question.text}`, adjustedAnswer);
+  };
+
+  const isFormComplete = questions.every(
+    (question) => responses[`Compensación - ${question.text}`] !== undefined
+  );
+
+  const handleNextClick = () => {
+    if (!isFormComplete) {
+      alert("Responde todas las preguntas");
+      return;
+    }
+    navigate('/ToolBenefits');
   };
 
   return (
     <Container>
       <Content>
-      <Tittle>Compensación</Tittle>
+        <Title>Compensación</Title>
         {questions.map((question, index) => (
           <Question key={index}>
             <QuestionText>{question.text}</QuestionText>
             <Answers>
-              {question.answers.map((answer, idx) => (
-                <Answer
-                  key={idx}
-                  onClick={() => handleAnswerClick(index, answer)}
-                  selected={selectedAnswers[index] === answer}
-                >
-                  {answer} - {getAnswerText(answer)}
-                </Answer>
-              ))}
+              {question.answers.map((answer, idx) => {
+                const storedAnswer = responses[`Compensación - ${question.text}`];
+                const isSelected = storedAnswer === (question.inverse ? 6 - answer : answer);
+
+                return (
+                  <Answer
+                    key={idx}
+                    onClick={() => handleAnswerClick(index, answer)}
+                    selected={isSelected}
+                  >
+                    {answer} - {getAnswerText(answer)}
+                  </Answer>
+                );
+              })}
             </Answers>
           </Question>
         ))}
       </Content>
-      <Button>
-        <StyledLink to={'/ToolBenefits'}>Siguiente</StyledLink>
-        </Button>
+      <Button onClick={handleNextClick} disabled={!isFormComplete}>
+        Siguiente
+      </Button>
     </Container>
   );
 };
@@ -74,10 +96,9 @@ const getAnswerText = (answer) => {
 
 export default InfoTool;
 
-const Tittle = styled.h1`
+const Title = styled.h1`
   font-size: 2.5rem;
   color: #333;
-  align-items: center;
   text-align: center;
 
   @media (max-width: 768px) {
@@ -148,13 +169,13 @@ const Answer = styled.button`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: ${({ disabled }) => (disabled ? 'gray' : 'white')};
+  color: ${({ disabled }) => (disabled ? '#999' : '#666')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: 0.3s;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 200px;
@@ -165,8 +186,8 @@ const Button = styled.button`
   margin-right: auto;
 
   &:hover {
-    background-color: gray;
-    color: white;
+    background-color: ${({ disabled }) => (disabled ? 'gray' : 'gray')};
+    color: ${({ disabled }) => (disabled ? '#999' : 'white')};
   }
 
   @media (max-width: 768px) {
@@ -178,9 +199,4 @@ const Button = styled.button`
     font-size: 0.875rem;
     padding: 5px 10px;
   }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
 `;

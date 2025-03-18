@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
+import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
 
 const questions = [
   {
-    text: 'Me gusta el trabajo que  desempeño',
+    text: 'Me gusta el trabajo que desempeño',
     answers: [1, 2, 3, 4, 5]
   },
   {
@@ -21,24 +22,42 @@ const questions = [
   },
   {
     text: 'Frecuentemente pienso en cambiar de empleo',
-    answers: [1, 2, 3, 4, 5]
+    answers: [1, 2, 3, 4, 5],
+    inverse: true, // Indica que la respuesta debe ser invertida
   }
 ];
 
 const InfoTool = () => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const { responses, saveAnswer } = useContext(SurveyContext);
+  const navigate = useNavigate(); // Para redirigir
 
   const handleAnswerClick = (questionIndex, answer) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answer
-    });
+    const question = questions[questionIndex];
+
+    // Si la pregunta es inversa, ajustamos la respuesta
+    const adjustedAnswer = question.inverse ? 6 - answer : answer;
+
+    saveAnswer(`Organizacion - ${question.text}`, adjustedAnswer);
+  };
+
+  // Verificar si todas las preguntas han sido respondidas
+  const allQuestionsAnswered = questions.every(
+    (question) => responses[`Organizacion - ${question.text}`] !== undefined
+  );
+
+  // Manejar clic en "Siguiente"
+  const handleNextClick = () => {
+    if (!allQuestionsAnswered) {
+      alert('Responde todas las preguntas');
+    } else {
+      navigate('/ToolComunication');
+    }
   };
 
   return (
     <Container>
       <Content>
-      <Tittle>Identificacion con la organización</Tittle>
+        <Tittle>Identificación con la organización</Tittle>
         {questions.map((question, index) => (
           <Question key={index}>
             <QuestionText>{question.text}</QuestionText>
@@ -47,7 +66,7 @@ const InfoTool = () => {
                 <Answer
                   key={idx}
                   onClick={() => handleAnswerClick(index, answer)}
-                  selected={selectedAnswers[index] === answer}
+                  selected={responses[`Organizacion - ${question.text}`] === (question.inverse ? 6 - answer : answer)}
                 >
                   {answer} - {getAnswerText(answer)}
                 </Answer>
@@ -56,45 +75,34 @@ const InfoTool = () => {
           </Question>
         ))}
       </Content>
-      <Button>
-        <StyledLink to={'/ToolComunication'}>Siguiente</StyledLink>
-        </Button>
+      <Button onClick={handleNextClick} disabled={!allQuestionsAnswered}>
+        Siguiente
+      </Button>
     </Container>
   );
 };
 
 const getAnswerText = (answer) => {
   switch (answer) {
-    case 1:
-      return 'Muy en desacuerdo';
-    case 2:
-      return 'En desacuerdo';
-    case 3:
-      return 'Ni de acuerdo ni en desacuerdo';
-    case 4:
-      return 'De acuerdo';
-    case 5:
-      return 'Totalmente de acuerdo';
-    default:
-      return '';
+    case 1: return 'Muy en desacuerdo';
+    case 2: return 'En desacuerdo';
+    case 3: return 'Ni de acuerdo ni en desacuerdo';
+    case 4: return 'De acuerdo';
+    case 5: return 'Totalmente de acuerdo';
+    default: return '';
   }
 };
 
 export default InfoTool;
 
+// Estilos
 const Tittle = styled.h1`
   font-size: 2.5rem;
   color: #333;
-  align-items: center;
   text-align: center;
 
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
-  }
+  @media (max-width: 768px) { font-size: 2rem; }
+  @media (max-width: 480px) { font-size: 1.5rem; }
 `;
 
 const Container = styled.div`
@@ -116,22 +124,12 @@ const Content = styled.div`
   max-width: 800px;
   width: 100%;
 
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
+  @media (max-width: 768px) { padding: 15px; }
+  @media (max-width: 480px) { padding: 10px; }
 `;
 
-const Question = styled.div`
-  margin-bottom: 20px;
-`;
-
-const QuestionText = styled.h3`
-  margin-bottom: 10px;
-`;
+const Question = styled.div` margin-bottom: 20px; `;
+const QuestionText = styled.h3` margin-bottom: 10px; `;
 
 const Answers = styled.div`
   display: flex;
@@ -156,13 +154,13 @@ const Answer = styled.button`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: ${({ disabled }) => (disabled ? '#ccc' : 'white')};
+  color: ${({ disabled }) => (disabled ? '#888' : '#666')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: 0.3s;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 200px;
@@ -173,22 +171,7 @@ const Button = styled.button`
   margin-right: auto;
 
   &:hover {
-    background-color: gray;
-    color: white;
+    background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
+    color: ${({ disabled }) => (disabled ? '#888' : 'white')};
   }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 8px 15px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.875rem;
-    padding: 5px 10px;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
 `;

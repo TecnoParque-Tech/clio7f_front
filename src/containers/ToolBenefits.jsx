@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';  
+import { Link } from 'react-router-dom';
+import { SurveyContext } from '../SurveyContext';
 
 const questions = [
   {
@@ -14,28 +15,31 @@ const questions = [
 ];
 
 const InfoTool = () => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const { responses, saveAnswer } = useContext(SurveyContext);
 
   const handleAnswerClick = (questionIndex, answer) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answer
-    });
+    const questionKey = `Beneficios - ${questions[questionIndex].text}`;
+    saveAnswer(questionKey, answer);
   };
+
+  // Verifica si todas las preguntas han sido respondidas
+  const allAnswered = questions.every(
+    (question) => responses[`Beneficios - ${question.text}`] !== undefined
+  );
 
   return (
     <Container>
       <Content>
-      <Tittle>Beneficios</Tittle>
+        <Title>Beneficios</Title>
         {questions.map((question, index) => (
           <Question key={index}>
             <QuestionText>{question.text}</QuestionText>
             <Answers>
-              {question.answers.map((answer, idx) => (
+              {question.answers.map((answer) => (
                 <Answer
-                  key={idx}
+                  key={answer}
                   onClick={() => handleAnswerClick(index, answer)}
-                  selected={selectedAnswers[index] === answer}
+                  selected={responses[`Beneficios - ${question.text}`] === answer}
                 >
                   {answer} - {getAnswerText(answer)}
                 </Answer>
@@ -44,36 +48,29 @@ const InfoTool = () => {
           </Question>
         ))}
       </Content>
-      <Button>
-        <StyledLink to={'/acknowledgment'}>Siguiente</StyledLink>
-        </Button>
+      <Button disabled={!allAnswered}>
+        <StyledLink to={allAnswered ? '/acknowledgment' : '#'}>Enviar</StyledLink>
+      </Button>
     </Container>
   );
 };
 
 const getAnswerText = (answer) => {
-  switch (answer) {
-    case 1:
-      return 'Muy en desacuerdo';
-    case 2:
-      return 'En desacuerdo';
-    case 3:
-      return 'Ni de acuerdo ni en desacuerdo';
-    case 4:
-      return 'De acuerdo';
-    case 5:
-      return 'Totalmente de acuerdo';
-    default:
-      return '';
-  }
+  const labels = [
+    'Muy en desacuerdo',
+    'En desacuerdo',
+    'Ni de acuerdo ni en desacuerdo',
+    'De acuerdo',
+    'Totalmente de acuerdo'
+  ];
+  return labels[answer - 1] || '';
 };
 
 export default InfoTool;
 
-const Tittle = styled.h1`
+const Title = styled.h1`
   font-size: 2.5rem;
   color: #333;
-  align-items: center;
   text-align: center;
 
   @media (max-width: 768px) {
@@ -88,7 +85,6 @@ const Tittle = styled.h1`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   min-height: 100vh;
   background-color: rgb(176, 216, 255);
@@ -96,7 +92,6 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  text-align: justify;
   background-color: white;
   padding: 20px;
   border-radius: 20px;
@@ -133,7 +128,7 @@ const Answer = styled.button`
   border-radius: 5px;
   padding: 10px;
   cursor: pointer;
-  width: 30%;
+  width: 50%;
   text-align: left;
   color: ${({ selected }) => (selected ? 'white' : 'black')};
 
@@ -144,39 +139,35 @@ const Answer = styled.button`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: ${({ disabled }) => (disabled ? '#ccc' : 'white')};
+  color: ${({ disabled }) => (disabled ? '#888' : '#666')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: 0.3s;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
-  max-width: 200px;
-  width: 100%;
   margin-top: 20px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  max-width: 200px;
 
   &:hover {
-    background-color: gray;
-    color: white;
+    background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
+    color: ${({ disabled }) => (disabled ? '#888' : 'white')};
   }
 
   @media (max-width: 768px) {
     font-size: 1rem;
-    padding: 8px 15px;
   }
 
   @media (max-width: 480px) {
     font-size: 0.875rem;
-    padding: 5px 10px;
   }
 `;
 
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: inherit;
+  pointer-events: ${({ to }) => (to === '#' ? 'none' : 'auto')};
 `;

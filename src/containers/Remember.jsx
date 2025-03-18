@@ -19,7 +19,7 @@ const Remember = () => {
       </Content>
       <ButtonContainer>
         <Button>
-          <StyledLink to={"/sociodemographic"}>Acepto</StyledLink>
+          <StyledLink to={"/personalinformation"}>Acepto</StyledLink>
         </Button>
         <Button>
           <StyledLink to={"/presentation"}>No Acepto</StyledLink>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
+import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
 
 const questions = [
   {
@@ -12,7 +13,7 @@ const questions = [
     answers: [1, 2, 3, 4, 5]
   },
   {
-    text: 'Me identifico con las  metas de la organización',
+    text: 'Me identifico con las metas de la organización',
     answers: [1, 2, 3, 4, 5]
   },
   {
@@ -28,7 +29,7 @@ const questions = [
     answers: [1, 2, 3, 4, 5]
   },
   {
-    text: 'Se me han comunicado mis funciones y responsabilidades  de manera clara',
+    text: 'Se me han comunicado mis funciones y responsabilidades de manera clara',
     answers: [1, 2, 3, 4, 5]
   },
   {
@@ -46,19 +47,29 @@ const questions = [
 ];
 
 const InfoTool = () => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const { responses, saveAnswer } = useContext(SurveyContext);
+  const navigate = useNavigate();
 
   const handleAnswerClick = (questionIndex, answer) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answer
-    });
+    saveAnswer(`Comunicacion - ${questions[questionIndex].text}`, answer);
+  };
+
+  const isFormComplete = questions.every(
+    (question) => responses[`Comunicacion - ${question.text}`] !== undefined
+  );
+
+  const handleNextClick = () => {
+    if (!isFormComplete) {
+      alert("Responde todas las preguntas");
+      return;
+    }
+    navigate('/ToolEnvironment');
   };
 
   return (
     <Container>
       <Content>
-      <Tittle>Claridad y comunicación</Tittle>
+        <Title>Claridad y comunicación</Title>
         {questions.map((question, index) => (
           <Question key={index}>
             <QuestionText>{question.text}</QuestionText>
@@ -67,7 +78,7 @@ const InfoTool = () => {
                 <Answer
                   key={idx}
                   onClick={() => handleAnswerClick(index, answer)}
-                  selected={selectedAnswers[index] === answer}
+                  selected={responses[`Comunicacion - ${question.text}`] === answer}
                 >
                   {answer} - {getAnswerText(answer)}
                 </Answer>
@@ -76,9 +87,9 @@ const InfoTool = () => {
           </Question>
         ))}
       </Content>
-      <Button>
-        <StyledLink to={'/ToolEnvironment'}>Siguiente</StyledLink>
-        </Button>
+      <Button onClick={handleNextClick} disabled={!isFormComplete}>
+        Siguiente
+      </Button>
     </Container>
   );
 };
@@ -102,10 +113,9 @@ const getAnswerText = (answer) => {
 
 export default InfoTool;
 
-const Tittle = styled.h1`
+const Title = styled.h1`
   font-size: 2.5rem;
   color: #333;
-  align-items: center;
   text-align: center;
 
   @media (max-width: 768px) {
@@ -176,13 +186,13 @@ const Answer = styled.button`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: ${({ disabled }) => (disabled ? 'gray' : 'white')};
+  color: ${({ disabled }) => (disabled ? '#999' : '#666')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: 0.3s;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 200px;
@@ -193,8 +203,8 @@ const Button = styled.button`
   margin-right: auto;
 
   &:hover {
-    background-color: gray;
-    color: white;
+    background-color: ${({ disabled }) => (disabled ? 'gray' : 'gray')};
+    color: ${({ disabled }) => (disabled ? '#999' : 'white')};
   }
 
   @media (max-width: 768px) {
@@ -206,9 +216,4 @@ const Button = styled.button`
     font-size: 0.875rem;
     padding: 5px 10px;
   }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
 `;

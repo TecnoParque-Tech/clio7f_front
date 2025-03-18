@@ -6,9 +6,11 @@ function Navbar() {
   return (
     <>
       <NavContainer>
-        <h1>
-          Clio 7<span>F</span>
-        </h1>
+        <a href="/">
+          <h1>
+            Clio 7<span>F</span>
+          </h1>
+        </a>
       </NavContainer>
     </>
   );

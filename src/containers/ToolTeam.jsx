@@ -1,44 +1,63 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { SurveyContext } from '../SurveyContext';
 
 const questions = [
   {
     text: 'Puedo contar con mis compañeros de trabajo cuando los necesito',
-    answers: [1, 2, 3, 4, 5]
+    answers: [1, 2, 3, 4, 5],
   },
   {
     text: 'Existe ayuda mutua entre los compañeros de trabajo',
-    answers: [1, 2, 3, 4, 5]
+    answers: [1, 2, 3, 4, 5],
   },
   {
-    text: 'Percibo conflictos entre los compañeros de trabajo',
-    answers: [1, 2, 3, 4, 5]
+    text: 'Percibo conflictos entre los compañeros de trabajo', // Pregunta con inversión de escala
+    answers: [1, 2, 3, 4, 5],
+    inverse: true, // Indica que debe ser invertida internamente
   },
   {
     text: 'Los compañeros de trabajo nos tratamos con respeto',
-    answers: [1, 2, 3, 4, 5]
+    answers: [1, 2, 3, 4, 5],
   },
   {
     text: 'Existen buenas relaciones interpersonales entre los compañeros de trabajo',
-    answers: [1, 2, 3, 4, 5]
+    answers: [1, 2, 3, 4, 5],
   },
 ];
 
 const InfoTool = () => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const { responses, saveAnswer } = useContext(SurveyContext);
+  const navigate = useNavigate(); // Para redirigir a la siguiente página
 
   const handleAnswerClick = (questionIndex, answer) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [questionIndex]: answer
-    });
+    const question = questions[questionIndex];
+
+    // Si la pregunta es inversa, se ajusta la respuesta antes de guardarla
+    const adjustedAnswer = question.inverse ? 6 - answer : answer;
+
+    saveAnswer(`Equipo - ${question.text}`, adjustedAnswer);
+  };
+
+  // Verificar si todas las preguntas han sido respondidas
+  const allQuestionsAnswered = questions.every(
+    (question) => responses[`Equipo - ${question.text}`] !== undefined
+  );
+
+  // Manejar clic en botón "Siguiente"
+  const handleNextClick = () => {
+    if (!allQuestionsAnswered) {
+      alert('Responde todas las preguntas');
+    } else {
+      navigate('/ToolOrganization'); // Redirige si todo está completo
+    }
   };
 
   return (
     <Container>
       <Content>
-      <Tittle>Relacionamiento con el equipo</Tittle>
+        <Tittle>Relacionamiento con el equipo</Tittle>
         {questions.map((question, index) => (
           <Question key={index}>
             <QuestionText>{question.text}</QuestionText>
@@ -47,7 +66,7 @@ const InfoTool = () => {
                 <Answer
                   key={idx}
                   onClick={() => handleAnswerClick(index, answer)}
-                  selected={selectedAnswers[index] === answer}
+                  selected={responses[`Equipo - ${question.text}`] === (question.inverse ? 6 - answer : answer)}
                 >
                   {answer} - {getAnswerText(answer)}
                 </Answer>
@@ -56,9 +75,9 @@ const InfoTool = () => {
           </Question>
         ))}
       </Content>
-      <Button>
-        <StyledLink to={'/ToolOrganiZation'}>Siguiente</StyledLink>
-        </Button>
+      <Button onClick={handleNextClick} disabled={!allQuestionsAnswered}>
+        Siguiente
+      </Button>
     </Container>
   );
 };
@@ -82,19 +101,11 @@ const getAnswerText = (answer) => {
 
 export default InfoTool;
 
+// Estilos
 const Tittle = styled.h1`
   font-size: 2.5rem;
   color: #333;
-  align-items: center;
   text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
-  }
 `;
 
 const Container = styled.div`
@@ -115,14 +126,6 @@ const Content = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 800px;
   width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
 `;
 
 const Question = styled.div`
@@ -154,14 +157,15 @@ const Answer = styled.button`
     color: white;
   }
 `;
+
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: ${({ disabled }) => (disabled ? '#ccc' : 'white')};
+  color: ${({ disabled }) => (disabled ? '#888' : '#666')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: 0.3s;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 200px;
@@ -172,22 +176,7 @@ const Button = styled.button`
   margin-right: auto;
 
   &:hover {
-    background-color: gray;
-    color: white;
+    background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
+    color: ${({ disabled }) => (disabled ? '#888' : 'white')};
   }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 8px 15px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.875rem;
-    padding: 5px 10px;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
 `;

@@ -1,28 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Presentation = () => {
-  const handleSubmit = () => {
-    const input = document.getElementById('nit-input');
-    if (!input.value) {
-      alert('Por favor ingrese el NIT o documento de identidad.');
-    } else {
-      const isConfirmed = window.confirm(`¿Es correcto el valor ingresado: ${input.value}?`);
-      if (isConfirmed) {
-        window.location.href = '/textintroductory';
-      }
-    }
+  const [nit, setNit] = useState(() => localStorage.getItem("companyNIT") || "");
+  const navigate = useNavigate();
+
+  // Manejar cambios en el input, permitiendo solo números
+  const handleInputChange = (event) => {
+    const value = event.target.value.replace(/[^\d]/g, ""); // Permite solo números
+    setNit(value);
   };
 
-  const handleInputChange = (event) => {
-    const value = event.target.value;
-    event.target.value = value.replace(/\D/g, '');
+  const handleSubmit = () => {
+    if (!nit.trim()) {
+      alert("Por favor ingrese el NIT o documento de identidad.");
+    } else if (!/^\d{8,}$/.test(nit)) {
+      alert("El NIT debe contener solo números y tener al menos 8 dígitos.");
+    } else {
+      localStorage.setItem("companyNIT", nit); // Guarda el NIT
+      navigate("/TextIntroductory"); // Redirige a la primera sección de la encuesta
+    }
   };
 
   return (
     <Container>
       <Content>
-        <WelcomeMessage>!Hola¡</WelcomeMessage>
+        <WelcomeMessage>¡Hola!</WelcomeMessage>
         <InformationMessage>
           <p>
             Antes de comenzar, ingresa por favor el NIT o documento de identidad 
@@ -31,10 +35,11 @@ const Presentation = () => {
           <Input 
             id="nit-input" 
             type="text" 
-            placeholder="Ingrese NIT o documento de identidad" 
-            pattern="\d*" 
-            required 
+            value={nit} 
             onChange={handleInputChange} 
+            placeholder="Ingrese NIT o documento de identidad" 
+            required 
+            aria-label="Ingrese el NIT o documento de identidad de la empresa"
           />
         </InformationMessage>
       </Content>
