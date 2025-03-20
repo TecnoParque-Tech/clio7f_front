@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useContext } from "react";
 import { SurveyContext } from "../SurveyContext";
 import * as XLSX from "xlsx";
@@ -6,28 +5,60 @@ import * as XLSX from "xlsx";
 const ExportButton = () => {
   const { responses } = useContext(SurveyContext);
 
-  const exportToExcel = () => {
-    const companyNIT = localStorage.getItem("companyNIT") || "NIT no ingresado"; // Recupera el NIT
+  const exportToExcel = async () => {
+    const companyNIT = localStorage.getItem("companyNIT") || "NIT no ingresado";
     const savedResponses = JSON.parse(localStorage.getItem("surveyResponses")) || {};
+    const userName = `${savedResponses.firstName || "Desconocido"}_${savedResponses.lastName || "Usuario"}`;
 
-    // Combinar respuestas de la encuesta y datos personales
+    // Mapeo de claves en inglés a español
+    const translatedResponses = {
+      "Nombres": savedResponses.firstName || "No ingresado",
+      "Apellidos": savedResponses.lastName || "No ingresado",
+      "Correo": savedResponses.email || "No ingresado",
+      "Celular": savedResponses.phone || "No ingresado",
+      "Fecha de Nacimiento": savedResponses.birthDate || "No ingresado",
+    };
+
+    // Datos estructurados
     const data = [
-      { Pregunta: "NIT de la Empresa", Respuesta: companyNIT }, // Agregar NIT como primera fila
-      { Pregunta: "Nombres", Respuesta: savedResponses.firstName || "No ingresado" },
-      { Pregunta: "Apellidos", Respuesta: savedResponses.lastName || "No ingresado" },
-      { Pregunta: "Correo", Respuesta: savedResponses.email || "No ingresado" },
-      { Pregunta: "Celular", Respuesta: savedResponses.phone || "No ingresado" },
-      ...Object.keys(responses).map((key) => ({
-        Pregunta: key,
-        Respuesta: responses[key],
-      })),
+      ["Pregunta", "Respuesta"],
+      ["NIT de la Empresa", companyNIT], 
+      ["", ""],
+      ...Object.entries(translatedResponses),
+      ["", ""],
+      ...Object.entries(responses),
     ];
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    // Crear hoja de Excel
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Respuestas");
 
-    XLSX.writeFile(workbook, "Respuestas_Clima_Organizacional.xlsx");
+    // Convertir a Blob (Formato adecuado para enviar a backend)
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const fileBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+    // Crear FormData para enviar el archivo
+    const formData = new FormData();
+    formData.append("file", fileBlob, `${userName}.xlsx`);
+    formData.append("name", userName); // Enviar nombre asociado
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/upload/", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log("Archivo enviado con éxito.");
+      } else {
+        console.error("Error al enviar el archivo.");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+    }
+
+    XLSX.writeFile(workbook, `${userName}.xlsx`);
 
     // Limpiar localStorage después de exportar
     localStorage.removeItem("surveyResponses");
@@ -50,21 +81,6 @@ const ExportButton = () => {
     display: "block",
     marginLeft: "auto",
     marginRight: "auto",
-  };
-
-  const hoverStyle = {
-    backgroundColor: "gray",
-    color: "white",
-  };
-
-  const mediaQuery768 = {
-    fontSize: "1rem",
-    padding: "8px 15px",
-  };
-
-  const mediaQuery480 = {
-    fontSize: "0.875rem",
-    padding: "5px 10px",
   };
 
   return <button style={buttonStyle} onClick={exportToExcel}>Enviar y Exportar</button>;

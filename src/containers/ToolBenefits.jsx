@@ -128,7 +128,7 @@ const Answer = styled.button`
   border-radius: 5px;
   padding: 10px;
   cursor: pointer;
-  width: 50%;
+  width: 30%;
   text-align: left;
   color: ${({ selected }) => (selected ? 'white' : 'black')};
 
