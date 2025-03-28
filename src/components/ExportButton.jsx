@@ -5,85 +5,97 @@ import * as XLSX from "xlsx";
 const ExportButton = () => {
   const { responses } = useContext(SurveyContext);
 
-  const exportToExcel = async () => {
+  const sendDataToBackend = async () => {
     const companyNIT = localStorage.getItem("companyNIT") || "NIT no ingresado";
     const savedResponses = JSON.parse(localStorage.getItem("surveyResponses")) || {};
-    const userName = `${savedResponses.firstName || "Desconocido"}_${savedResponses.lastName || "Usuario"}`;
 
-    // Mapeo de claves en inglés a español
-    const translatedResponses = {
-      "Nombres": savedResponses.firstName || "No ingresado",
-      "Apellidos": savedResponses.lastName || "No ingresado",
-      "Correo": savedResponses.email || "No ingresado",
-      "Celular": savedResponses.phone || "No ingresado",
-      "Fecha de Nacimiento": savedResponses.birthDate || "No ingresado",
+    // Combinar respuestas
+    const dataToSend = {
+      companyNIT,
+      responses: { ...savedResponses, ...responses },
     };
 
-    // Datos estructurados
-    const data = [
-      ["Pregunta", "Respuesta"],
-      ["NIT de la Empresa", companyNIT], 
-      ["", ""],
-      ...Object.entries(translatedResponses),
-      ["", ""],
-      ...Object.entries(responses),
-    ];
-
-    // Crear hoja de Excel
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Respuestas");
-
-    // Convertir a Blob (Formato adecuado para enviar a backend)
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const fileBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-    // Crear FormData para enviar el archivo
-    const formData = new FormData();
-    formData.append("file", fileBlob, `${userName}.xlsx`);
-    formData.append("name", userName); // Enviar nombre asociado
+    console.log("📤 Enviando datos al backend:", dataToSend); // Depuración en consola
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/upload/", {
+      const response = await fetch("http://127.0.0.1:8000/api/save-survey/", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {
-        console.log("Archivo enviado con éxito.");
+        console.log("✅ Datos enviados correctamente");
+        exportToExcel(); // Exportar después de enviar
       } else {
-        console.error("Error al enviar el archivo.");
+        console.error("❌ Error al enviar los datos");
       }
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      console.error("❌ Error en la solicitud:", error);
     }
+  };
 
-    XLSX.writeFile(workbook, `${userName}.xlsx`);
+  const exportToExcel = () => {
+    const companyNIT = localStorage.getItem("companyNIT") || "NIT no ingresado";
+    const savedResponses = JSON.parse(localStorage.getItem("surveyResponses")) || {};
 
-    // Limpiar localStorage después de exportar
+    const fieldTranslations = {
+      firstName: "Nombres",
+      lastName: "Apellidos",
+      email: "Correo",
+      phone: "Celular",
+      birthDate: "Fecha de Nacimiento",
+    };
+
+    const data = [
+      { Pregunta: "NIT de la Empresa", Respuesta: companyNIT },
+      ...Object.keys(savedResponses).map((key) => ({
+        Pregunta: fieldTranslations[key] || key,
+        Respuesta: savedResponses[key] || "No ingresado",
+      })),
+      ...Object.keys(responses).map((key) => ({
+        Pregunta: key,
+        Respuesta: responses[key],
+      })),
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Respuestas");
+
+    XLSX.writeFile(workbook, "Respuestas_Clima_Organizacional.xlsx");
+
+    // Limpiar almacenamiento local después de la exportación
     localStorage.removeItem("surveyResponses");
     localStorage.removeItem("companyNIT");
   };
 
-  const buttonStyle = {
-    backgroundColor: "white",
-    color: "#666",
-    fontSize: "1.25rem",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "0.3s",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 1)",
-    maxWidth: "200px",
-    width: "100%",
-    marginTop: "20px",
-    display: "block",
-    marginLeft: "auto",
-    marginRight: "auto",
-  };
-
-  return <button style={buttonStyle} onClick={exportToExcel}>Enviar y Exportar</button>;
+  return (
+    <button
+      style={{
+        backgroundColor: "white",
+        color: "#666",
+        fontSize: "1.25rem",
+        padding: "10px 20px",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        transition: "0.3s",
+        boxShadow: "0 0 10px rgba(0, 0, 0, 1)",
+        maxWidth: "200px",
+        width: "100%",
+        marginTop: "20px",
+        display: "block",
+        marginLeft: "auto",
+        marginRight: "auto",
+      }}
+      onClick={sendDataToBackend} // Enviar datos antes de exportar
+    >
+      Enviar y Exportar
+    </button>
+  );
 };
 
 export default ExportButton;

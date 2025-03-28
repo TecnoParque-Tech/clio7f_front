@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
+import { SurveyContext } from '../SurveyContext';
 
 const questions = [
   { text: 'La temperatura de mi lugar de trabajo es adecuada', answers: [1, 2, 3, 4, 5] },
@@ -13,14 +13,25 @@ const InfoTool = () => {
   const navigate = useNavigate();
   const { responses, saveAnswer } = useContext(SurveyContext);
 
+  // Cargar respuestas desde localStorage al montar el componente
+  useEffect(() => {
+    const storedResponses = JSON.parse(localStorage.getItem('surveyResponses')) || {};
+    Object.keys(storedResponses).forEach(key => saveAnswer(key, storedResponses[key]));
+  }, [saveAnswer]);
+
   const handleAnswerClick = (questionIndex, answer) => {
-    saveAnswer(`Ambiente - ${questions[questionIndex].text}`, answer);
+    const questionKey = `Ambiente - ${questions[questionIndex].text}`;
+    saveAnswer(questionKey, answer);
+
+    // Guardar la respuesta en localStorage
+    const updatedResponses = { ...responses, [questionKey]: answer };
+    localStorage.setItem('surveyResponses', JSON.stringify(updatedResponses));
   };
 
   const handleNext = () => {
     const allAnswered = questions.every(q => responses[`Ambiente - ${q.text}`] !== undefined);
     if (!allAnswered) {
-      alert("Responde todas las preguntas");
+      alert('Responde todas las preguntas');
       return;
     }
     navigate('/ToolCompensation');

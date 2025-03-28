@@ -1,7 +1,6 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';  
-import { SurveyContext } from '../SurveyContext';
+import { Link } from 'react-router-dom';
 
 const questions = [
   { question: "Indique su edad de acuerdo a los siguientes rangos", options: ["Entre 18 y 23 años", "Entre 24 y 30 años", "Entre 30 y 40 años", "Entre 40 y 50 años", "Más de 50 años"] },
@@ -17,27 +16,32 @@ const questions = [
 ];
 
 const SocioDemographic = () => {
-  const { responses, saveAnswer } = useContext(SurveyContext);
+  // Cargar respuestas desde localStorage
   const [selectedAnswers, setSelectedAnswers] = useState(() => {
-    return questions.map((q) => responses[q.question] || null);
+    const savedResponses = JSON.parse(localStorage.getItem('socioDemographicResponses')) || {};
+    return questions.map((q) => savedResponses[q.question] || "");
   });
 
   useEffect(() => {
-    setSelectedAnswers(questions.map((q) => responses[q.question] || null));
-  }, [responses]);
+    // Guardar respuestas en localStorage cuando cambian
+    localStorage.setItem('socioDemographicResponses', JSON.stringify(
+      questions.reduce((acc, q, index) => {
+        acc[q.question] = selectedAnswers[index];
+        return acc;
+      }, {})
+    ));
+  }, [selectedAnswers]);
 
   const handleOptionChange = (questionIndex, option) => {
     const updatedAnswers = [...selectedAnswers];
     updatedAnswers[questionIndex] = option;
     setSelectedAnswers(updatedAnswers);
-    saveAnswer(questions[questionIndex].question, option);
   };
 
   const handleTextChange = (questionIndex, text) => {
     const updatedAnswers = [...selectedAnswers];
     updatedAnswers[questionIndex] = text;
     setSelectedAnswers(updatedAnswers);
-    saveAnswer(questions[questionIndex].question, text);
   };
 
   // Verifica si todas las preguntas han sido respondidas
@@ -53,7 +57,7 @@ const SocioDemographic = () => {
             {question.isTextInput ? (
               <TextInput
                 type="text"
-                value={selectedAnswers[questionIndex] || ""}
+                value={selectedAnswers[questionIndex]}
                 onChange={(e) => handleTextChange(questionIndex, e.target.value)}
               />
             ) : (

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { SurveyContext } from '../SurveyContext';
@@ -17,9 +17,18 @@ const questions = [
 const InfoTool = () => {
   const { responses, saveAnswer } = useContext(SurveyContext);
 
+  // Cargar respuestas almacenadas en localStorage al iniciar el componente
+  useEffect(() => {
+    const storedResponses = JSON.parse(localStorage.getItem('surveyResponses')) || {};
+    Object.entries(storedResponses).forEach(([key, value]) => saveAnswer(key, value));
+  }, [saveAnswer]);
+
   const handleAnswerClick = (questionIndex, answer) => {
     const questionKey = `Beneficios - ${questions[questionIndex].text}`;
+    const updatedResponses = { ...responses, [questionKey]: answer };
+
     saveAnswer(questionKey, answer);
+    localStorage.setItem('surveyResponses', JSON.stringify(updatedResponses)); // Guardar en localStorage
   };
 
   // Verifica si todas las preguntas han sido respondidas
@@ -72,14 +81,6 @@ const Title = styled.h1`
   font-size: 2.5rem;
   color: #333;
   text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
-  }
 `;
 
 const Container = styled.div`
@@ -98,14 +99,6 @@ const Content = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 800px;
   width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
 `;
 
 const Question = styled.div`
@@ -155,14 +148,6 @@ const Button = styled.button`
   &:hover {
     background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
     color: ${({ disabled }) => (disabled ? '#888' : 'white')};
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.875rem;
   }
 `;
 

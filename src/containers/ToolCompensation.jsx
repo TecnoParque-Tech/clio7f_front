@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
@@ -23,13 +23,23 @@ const InfoTool = () => {
   const { responses, saveAnswer } = useContext(SurveyContext);
   const navigate = useNavigate();
 
+  // Cargar respuestas previas desde localStorage
+  useEffect(() => {
+    const storedResponses = JSON.parse(localStorage.getItem('surveyResponses')) || {};
+    Object.keys(storedResponses).forEach((key) => saveAnswer(key, storedResponses[key]));
+  }, [saveAnswer]);
+
   const handleAnswerClick = (questionIndex, answer) => {
     const question = questions[questionIndex];
 
     // Si la pregunta tiene el campo "inverse", invertir la respuesta
     const adjustedAnswer = question.inverse ? 6 - answer : answer;
+    const questionKey = `Compensación - ${question.text}`;
 
-    saveAnswer(`Compensación - ${question.text}`, adjustedAnswer);
+    // Guardar en el contexto y en localStorage
+    saveAnswer(questionKey, adjustedAnswer);
+    const updatedResponses = { ...responses, [questionKey]: adjustedAnswer };
+    localStorage.setItem('surveyResponses', JSON.stringify(updatedResponses));
   };
 
   const isFormComplete = questions.every(
@@ -96,18 +106,11 @@ const getAnswerText = (answer) => {
 
 export default InfoTool;
 
+// Estilos
 const Title = styled.h1`
   font-size: 2.5rem;
   color: #333;
   text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
-  }
 `;
 
 const Container = styled.div`
@@ -128,14 +131,6 @@ const Content = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   max-width: 800px;
   width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
 `;
 
 const Question = styled.div`
@@ -188,15 +183,5 @@ const Button = styled.button`
   &:hover {
     background-color: ${({ disabled }) => (disabled ? 'gray' : 'gray')};
     color: ${({ disabled }) => (disabled ? '#999' : 'white')};
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 8px 15px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.875rem;
-    padding: 5px 10px;
   }
 `;

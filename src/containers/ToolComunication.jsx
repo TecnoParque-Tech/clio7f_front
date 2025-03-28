@@ -1,57 +1,38 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { SurveyContext } from '../SurveyContext'; // Importamos el contexto
+import { SurveyContext } from '../SurveyContext';
 
 const questions = [
-  {
-    text: 'La organización cumple los compromisos que asume con los empleados',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Las personas en esta organización cumplen con sus responsabilidades',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Me identifico con las metas de la organización',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'La organización me ha dado a conocer las normas y reglamentos institucionales',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Recibo la información necesaria para el desarrollo de mis labores',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Tengo claridad respecto a los resultados que se esperan de mi trabajo',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Se me han comunicado mis funciones y responsabilidades de manera clara',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'Los comportamientos de los empleados reflejan los valores de la organización',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'La organización comunica a los empleados las dificultades que se presentan',
-    answers: [1, 2, 3, 4, 5]
-  },
-  {
-    text: 'En la organización toman en cuenta las ideas y sugerencias de los empleados',
-    answers: [1, 2, 3, 4, 5]
-  }
+  { text: 'La organización cumple los compromisos que asume con los empleados', answers: [1, 2, 3, 4, 5] },
+  { text: 'Las personas en esta organización cumplen con sus responsabilidades', answers: [1, 2, 3, 4, 5] },
+  { text: 'Me identifico con las metas de la organización', answers: [1, 2, 3, 4, 5] },
+  { text: 'La organización me ha dado a conocer las normas y reglamentos institucionales', answers: [1, 2, 3, 4, 5] },
+  { text: 'Recibo la información necesaria para el desarrollo de mis labores', answers: [1, 2, 3, 4, 5] },
+  { text: 'Tengo claridad respecto a los resultados que se esperan de mi trabajo', answers: [1, 2, 3, 4, 5] },
+  { text: 'Se me han comunicado mis funciones y responsabilidades de manera clara', answers: [1, 2, 3, 4, 5] },
+  { text: 'Los comportamientos de los empleados reflejan los valores de la organización', answers: [1, 2, 3, 4, 5] },
+  { text: 'La organización comunica a los empleados las dificultades que se presentan', answers: [1, 2, 3, 4, 5] },
+  { text: 'En la organización toman en cuenta las ideas y sugerencias de los empleados', answers: [1, 2, 3, 4, 5] }
 ];
 
 const InfoTool = () => {
   const { responses, saveAnswer } = useContext(SurveyContext);
   const navigate = useNavigate();
 
+  // Cargar respuestas desde localStorage al iniciar
+  useEffect(() => {
+    const storedResponses = JSON.parse(localStorage.getItem('surveyResponses')) || {};
+    Object.keys(storedResponses).forEach(key => saveAnswer(key, storedResponses[key]));
+  }, [saveAnswer]);
+
   const handleAnswerClick = (questionIndex, answer) => {
-    saveAnswer(`Comunicacion - ${questions[questionIndex].text}`, answer);
+    const questionKey = `Comunicacion - ${questions[questionIndex].text}`;
+    saveAnswer(questionKey, answer);
+
+    // Guardar en localStorage
+    const updatedResponses = { ...responses, [questionKey]: answer };
+    localStorage.setItem('surveyResponses', JSON.stringify(updatedResponses));
   };
 
   const isFormComplete = questions.every(
@@ -96,18 +77,12 @@ const InfoTool = () => {
 
 const getAnswerText = (answer) => {
   switch (answer) {
-    case 1:
-      return 'Muy en desacuerdo';
-    case 2:
-      return 'En desacuerdo';
-    case 3:
-      return 'Ni de acuerdo ni en desacuerdo';
-    case 4:
-      return 'De acuerdo';
-    case 5:
-      return 'Totalmente de acuerdo';
-    default:
-      return '';
+    case 1: return 'Muy en desacuerdo';
+    case 2: return 'En desacuerdo';
+    case 3: return 'Ni de acuerdo ni en desacuerdo';
+    case 4: return 'De acuerdo';
+    case 5: return 'Totalmente de acuerdo';
+    default: return '';
   }
 };
 
@@ -118,13 +93,8 @@ const Title = styled.h1`
   color: #333;
   text-align: center;
 
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
-  }
+  @media (max-width: 768px) { font-size: 2rem; }
+  @media (max-width: 480px) { font-size: 1.5rem; }
 `;
 
 const Container = styled.div`
@@ -146,13 +116,8 @@ const Content = styled.div`
   max-width: 800px;
   width: 100%;
 
-  @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
+  @media (max-width: 768px) { padding: 15px; }
+  @media (max-width: 480px) { padding: 10px; }
 `;
 
 const Question = styled.div`
@@ -207,13 +172,6 @@ const Button = styled.button`
     color: ${({ disabled }) => (disabled ? '#999' : 'white')};
   }
 
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 8px 15px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.875rem;
-    padding: 5px 10px;
-  }
+  @media (max-width: 768px) { font-size: 1rem; padding: 8px 15px; }
+  @media (max-width: 480px) { font-size: 0.875rem; padding: 5px 10px; }
 `;
