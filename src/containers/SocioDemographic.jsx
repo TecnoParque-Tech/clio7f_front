@@ -90,7 +90,7 @@ export default SocioDemographic;
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #333;
+  color: white;
   text-align: center;
 
   @media (max-width: 768px) { font-size: 2rem; }
@@ -99,7 +99,8 @@ const Title = styled.h1`
 
 const Content = styled.div`
   text-align: justify;
-  background-color: white;
+  background-color: rgb(0,142,188,255);
+  color: white;
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
@@ -115,7 +116,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background-color: rgb(176, 216, 255);
+  background-color: white;
   padding: 20px;
 `;
 
@@ -143,8 +144,8 @@ const TextInput = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: ${({ disabled }) => (disabled ? '#ccc' : 'white')};
-  color: ${({ disabled }) => (disabled ? '#888' : '#666')};
+  background-color: ${({ disabled }) => (disabled ? 'rgb(0,142,188,255)' : 'rgb(0,142,188,255)')};
+  color: ${({ disabled }) => (disabled ? 'white' : 'white')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
@@ -157,8 +158,8 @@ const Button = styled.button`
   max-width: 200px;
 
   &:hover {
-    background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
-    color: ${({ disabled }) => (disabled ? '#888' : 'white')};
+    background-color: ${({ disabled }) => (disabled ? 'gray' : 'white')};
+    color: ${({ disabled }) => (disabled ? 'gray' : 'gray')};
   }
 
   @media (max-width: 768px) { font-size: 1rem; }

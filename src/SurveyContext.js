@@ -13,7 +13,7 @@ export const SurveyProvider = ({ children }) => {
   const saveAnswer = (questionId, answer) => {
     setResponses((prevResponses) => {
       const updatedResponses = { ...prevResponses, [questionId]: answer };
-      localStorage.setItem("surveyResponses", JSON.stringify(updatedResponses));
+      const savedResponses = JSON.parse(localStorage.getItem("surveyResponses"));
       return updatedResponses;
     });
   };

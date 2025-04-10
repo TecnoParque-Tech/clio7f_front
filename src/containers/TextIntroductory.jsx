@@ -61,7 +61,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: rgb(176, 216, 255);
+  background-color: white;
   padding: 20px;
   margin: 0;
 
@@ -76,7 +76,7 @@ const Container = styled.div`
 
 const Content = styled.div`
   text-align: center;
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
@@ -94,7 +94,7 @@ const Content = styled.div`
 
 const InformationMessage = styled.div`
   font-size: 1.25rem;
-  color: #666;
+  color: white;
   margin: 20px;
   text-align: justify;
 
@@ -111,7 +111,7 @@ const InformationMessage = styled.div`
 
 const WelcomeMessage = styled.h1`
   font-size: 2rem;
-  color: #333;
+  color: white;
 
   @media (max-width: 768px) {
     font-size: 1.75rem;
@@ -123,7 +123,7 @@ const WelcomeMessage = styled.h1`
 `;
 
 const Button = styled.button`
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   color: #666;
   font-size: 1.25rem;
   padding: 10px 20px;
@@ -131,7 +131,7 @@ const Button = styled.button`
   border-radius: 5px;
   cursor: pointer;
   transition: 0.3s;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgb(0, 0, 0);
   max-width: 200px;
   width: 100%;
   margin-top: 20px;
@@ -142,7 +142,7 @@ const Button = styled.button`
   }
 
   &:hover {
-    background-color: gray;
+    background-color: white;
     color: white;
   }
 

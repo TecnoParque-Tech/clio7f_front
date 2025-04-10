@@ -8,7 +8,7 @@ function Navbar() {
       <NavContainer>
         <a href="/">
           <h1>
-            Clio 7<span>F</span>
+            Clio <span>7F</span>
           </h1>
         </a>
       </NavContainer>
@@ -21,7 +21,7 @@ export default Navbar;
 const NavContainer = styled.nav`
   margin: 10px;
   padding: .2rem;
-  background-color: rgba(140, 196, 252);
+  background-color: rgb(0,142,188,255);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,11 +36,13 @@ const NavContainer = styled.nav`
   }
 
   h1 {
-    color: white;
+    color: rgba(68,168,44,255);
     font-weight: 50;
     font-size: 3rem;
+    font-weight: bold;
     margin: 5px;
     span {
+    color:rgba(213,0,92,255);
       font-weight: bold;
     }
   }

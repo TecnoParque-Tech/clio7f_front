@@ -141,7 +141,7 @@ export default PersonalInformation;
 // Estilos
 const Tittle = styled.h1`
   font-size: 2.5rem;
-  color: #333;
+  color: white;
   text-align: center;
 `;
 
@@ -154,7 +154,7 @@ const FormContainer = styled.div`
 `;
 
 const Content = styled.div`
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -164,6 +164,7 @@ const Content = styled.div`
 
 const FormField = styled.div`
   margin-bottom: 15px;
+  color: white;
   width: 100%;
 `;
 
@@ -181,7 +182,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
+  background-color: ${({ disabled }) => (disabled ? 'rgb(0,142,188,255)' : 'rgb(0,142,188,255)')};
   color: white;
   font-size: 1.25rem;
   padding: 10px 20px;

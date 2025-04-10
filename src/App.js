@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SurveyProvider } from "./SurveyContext";  // Importar el contexto
+import { useState } from "react";
+import { SurveyProvider } from "./SurveyContext";
 
 import Navbar from "./components/Navbar";
 import Presentation from "./containers/Presentation";
@@ -21,9 +22,17 @@ import ValidationCompany from "./containers/ValidationCompany";
 import Acknowledgment from "./containers/Acknowledgment";
 import PersonalInformation from "./containers/PersonalInformation";
 
+import AdminLogin from "./components/AdminLogin";
+import ExportAdmin from "./containers/ExportAdmin";
+import AdminDashboard from "./components/AdminDashboard";
+import AdminFileList from "./components/AdminFileList";
+import AdminDataView from "./components/AdminDataView";
+
 import "./App.css";
 
 function App() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
   return (
     <SurveyProvider>
       <BrowserRouter>
@@ -45,7 +54,27 @@ function App() {
           <Route path="/toolbenefits" element={<ToolBenefits />} />
           <Route path="/textintroductory" element={<TextIntroductory />} />
           <Route path="/acknowledgment" element={<Acknowledgment />} />
+          <Route path="/dashboard" element={<AdminDashboard />} />
           <Route index path="/" element={<ValidationCompany />} />
+          <Route path="/admin-files" element={<AdminFileList />} />
+
+          <Route
+            path="/admin"
+            element={
+              isAdmin
+                ? <ExportAdmin onLogout={() => setIsAdmin(false)} />
+                : <AdminLogin onLogin={() => setIsAdmin(true)} />
+            }
+          />
+
+          <Route
+            path="/admin-data"
+            element={
+              isAdmin
+                ? <AdminDataView />
+                : <AdminLogin onLogin={() => setIsAdmin(true)} />
+            }
+          />
         </Routes>
       </BrowserRouter>
     </SurveyProvider>

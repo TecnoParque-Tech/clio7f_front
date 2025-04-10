@@ -34,7 +34,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 70vh;
-  background-color: rgb(176, 216, 255);
+  background-color: white;
   padding: 20px;
 
   @media (max-width: 768px) {
@@ -50,8 +50,8 @@ const Container = styled.div`
 const InfoList = styled.div` 
   font-size: 1.25rem;
   text-align: justify;
-  color: #666;
-  background-color: white;
+  color: white;
+  background-color: rgb(0,142,188,255);
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
   border-radius: 20px;
   padding: 20px;

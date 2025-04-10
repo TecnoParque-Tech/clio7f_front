@@ -55,8 +55,7 @@ const FooterContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(140, 196, 252, 0.8);
-  border-top: 1px solid #ddd;
+  background-color: rgb(0,142,188,255);
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 100);
 `;
