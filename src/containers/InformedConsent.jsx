@@ -25,13 +25,13 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 75vh;
-  background-color: rgb(176, 216, 255);
+  background-color:white;
 
 `;
 
 const Content = styled.div`
   text-align: center;
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
@@ -49,7 +49,7 @@ const Content = styled.div`
 
 const Title = styled.h1`
   font-size: 2rem;
-  color: #333;
+  color: white;
   margin: 20px;
 
   @media (max-width: 768px) {
@@ -66,7 +66,7 @@ const Title = styled.h1`
 const InformationMessage = styled.div`
   font-size: 1.25rem;
   text-align: justify;
-  color: #666;
+  color: white;
   margin: 20px;
 
   @media (max-width: 768px) {

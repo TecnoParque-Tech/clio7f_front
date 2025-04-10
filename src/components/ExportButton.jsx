@@ -1,82 +1,63 @@
 import { useContext } from "react";
 import { SurveyContext } from "../SurveyContext";
-import * as XLSX from "xlsx";
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const ExportButton = () => {
   const { responses } = useContext(SurveyContext);
 
   const sendDataToBackend = async () => {
     const companyNIT = localStorage.getItem("companyNIT") || "NIT no ingresado";
-    const savedResponses = JSON.parse(localStorage.getItem("surveyResponses")) || {};
+    const savedResponses = JSON.parse(localStorage.getItem("surveyResponses")) || responses;
+    const socioDemographic = JSON.parse(localStorage.getItem("socioDemographicResponses")) || {};
+    const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
-    // Combinar respuestas
-    const dataToSend = {
-      companyNIT,
-      responses: { ...savedResponses, ...responses },
+    const combinedResponses = {
+      ...userInfo,
+      ...socioDemographic,
+      ...savedResponses,
     };
 
-    console.log("📤 Enviando datos al backend:", dataToSend); // Depuración en consola
+    if (!combinedResponses || Object.keys(combinedResponses).length === 0) {
+      alert("No hay respuestas para exportar. Asegúrate de completar la encuesta.");
+      return;
+    }
+
+    const userId = combinedResponses.email || `persona-${Date.now()}`;
+    const timestamp = new Date().toISOString();
+
+    const newEntry = {
+      id: userId,
+      companyNIT,
+      timestamp,
+      responses: combinedResponses,
+    };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/save-survey/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-      });
+      // 🔹 Guardar en Firestore
+      await addDoc(collection(db, "respuestas"), newEntry);
+      console.log("✅ Datos guardados en Firestore correctamente");
 
-      if (response.ok) {
-        console.log("✅ Datos enviados correctamente");
-        exportToExcel(); // Exportar después de enviar
-      } else {
-        console.error("❌ Error al enviar los datos");
-      }
+      // 🔹 Limpiar localStorage
+      localStorage.removeItem("surveyResponses");
+      localStorage.removeItem("socioDemographicResponses");
+      localStorage.removeItem("companyNIT");
+      localStorage.removeItem("userInfo");
+
+      alert("Respuestas enviadas con éxito ✅");
+
     } catch (error) {
-      console.error("❌ Error en la solicitud:", error);
+      console.error("Error al guardar los datos:", error);
+      alert("Error inesperado al guardar los datos ❌");
     }
-  };
-
-  const exportToExcel = () => {
-    const companyNIT = localStorage.getItem("companyNIT") || "NIT no ingresado";
-    const savedResponses = JSON.parse(localStorage.getItem("surveyResponses")) || {};
-
-    const fieldTranslations = {
-      firstName: "Nombres",
-      lastName: "Apellidos",
-      email: "Correo",
-      phone: "Celular",
-      birthDate: "Fecha de Nacimiento",
-    };
-
-    const data = [
-      { Pregunta: "NIT de la Empresa", Respuesta: companyNIT },
-      ...Object.keys(savedResponses).map((key) => ({
-        Pregunta: fieldTranslations[key] || key,
-        Respuesta: savedResponses[key] || "No ingresado",
-      })),
-      ...Object.keys(responses).map((key) => ({
-        Pregunta: key,
-        Respuesta: responses[key],
-      })),
-    ];
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Respuestas");
-
-    XLSX.writeFile(workbook, "Respuestas_Clima_Organizacional.xlsx");
-
-    // Limpiar almacenamiento local después de la exportación
-    localStorage.removeItem("surveyResponses");
-    localStorage.removeItem("companyNIT");
   };
 
   return (
     <button
+      onClick={sendDataToBackend}
       style={{
-        backgroundColor: "white",
-        color: "#666",
+        backgroundColor: "rgb(0,142,188,255)",
+        color: "white",
         fontSize: "1.25rem",
         padding: "10px 20px",
         border: "none",
@@ -91,9 +72,8 @@ const ExportButton = () => {
         marginLeft: "auto",
         marginRight: "auto",
       }}
-      onClick={sendDataToBackend} // Enviar datos antes de exportar
     >
-      Enviar y Exportar
+      Enviar
     </button>
   );
 };

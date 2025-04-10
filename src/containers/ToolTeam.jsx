@@ -49,7 +49,6 @@ const InfoTool = () => {
     if (!allQuestionsAnswered) {
       setError('⚠️ Responde todas las preguntas antes de continuar.');
     } else {
-      console.log("Navegando a /ToolOrganization");
       navigate('/ToolOrganization');
     }
   };
@@ -105,13 +104,13 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: rgb(176, 216, 255);
+  background-color: white;
   padding: 20px;
 `;
 
 const Content = styled.div`
   text-align: justify;
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
@@ -121,7 +120,7 @@ const Content = styled.div`
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #333;
+  color: white;
   text-align: center;
 `;
 
@@ -131,6 +130,7 @@ const Question = styled.div`
 
 
 const QuestionText = styled.h3`
+  color: white;
   margin-bottom: 10px;
 `;
 
@@ -141,7 +141,7 @@ const Answers = styled.div`
 `;
 
 const Answer = styled.button`
-  background-color: ${({ selected }) => (selected ? 'gray' : 'rgb(193, 193, 193)')};
+  background-color: ${({ selected }) => (selected ? 'gray' : 'rgb(255, 255, 255)')};
   border: 1px solid black;
   border-radius: 5px;
   padding: 10px;
@@ -157,8 +157,8 @@ const Answer = styled.button`
 `;
 
 const Button = styled.button`
-  background-color: ${({ disabled }) => (disabled ? '#ccc' : 'white')};
-  color: ${({ disabled }) => (disabled ? '#888' : '#666')};
+  background-color: ${({ disabled }) => (disabled ? 'rgb(0,142,188,255)' : 'rgb(0,142,188,255)')};
+  color: ${({ disabled }) => (disabled ? 'white' : 'white')};
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
@@ -174,8 +174,8 @@ const Button = styled.button`
   margin-right: auto;
 
   &:hover {
-    background-color: ${({ disabled }) => (disabled ? '#ccc' : 'gray')};
-    color: ${({ disabled }) => (disabled ? '#888' : 'white')};
+    background-color: ${({ disabled }) => (disabled ? 'white' : 'white')};
+    color: ${({ disabled }) => (disabled ? 'gray' : 'gray')};
   }
 `;
 

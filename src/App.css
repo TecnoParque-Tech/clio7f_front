@@ -1,9 +1,9 @@
 body{
-  background-color: rgb(176, 216, 255)
+  background-color: white;
 }
 
 .app-container {
-  background-color: aqua;
+  background-color: white;
   height: 100vh;
   display: flex;
   justify-content: center;

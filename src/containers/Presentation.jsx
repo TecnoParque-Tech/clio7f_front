@@ -28,13 +28,13 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 80vh;
-  background-color: rgb(176, 216, 255);
+  background-color: white;
   padding: 20px;
 `;
 
 const Content = styled.div`
   text-align: center;
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
@@ -52,7 +52,7 @@ const Content = styled.div`
 
 const InformationMessage = styled.div`
   font-size: 1.25rem;
-  color: #666;
+  color: white;
   margin: 20px;
 
   @media (max-width: 768px) {
@@ -68,7 +68,7 @@ const InformationMessage = styled.div`
 
 const WelcomeMessage = styled.h1`
   font-size: 2.5rem;
-  color: #333;
+  color: white;
 
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -80,8 +80,8 @@ const WelcomeMessage = styled.h1`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: rgb(0,142,188,255);
+  color: white;
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
@@ -94,8 +94,8 @@ const Button = styled.button`
   margin-top: 20px;
 
   &:hover {
-    background-color: gray;
-    color: white;
+    background-color: white;
+    color: gray;
   }
 
   @media (max-width: 768px) {

@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import ExportButton from "../components/ExportButton";
+import ExportAllButton from "../components/ExportAllButton";
 
 const Acknowledgment = () => {
   const handleClick = () => {
@@ -17,6 +18,7 @@ const Acknowledgment = () => {
           <p>Te estaremos contando si necesitmos algo mas.</p>
         </InformationMessage>
       </Content>
+      
       <ExportButton />
       
     </Container>
@@ -31,13 +33,13 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 70vh;
-  background-color: rgb(176, 216, 255);
+  background-color: white;
   padding: 20px;
 `;
 
 const Content = styled.div`
   text-align: justify;
-  background-color: white;
+  background-color: rgb(0,142,188,255);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
@@ -55,8 +57,8 @@ const Content = styled.div`
 `;
 
 const Button = styled.button`
-  background-color: white;
-  color: #666;
+  background-color: rgb(0,142,188,255);
+  color: #;
   font-size: 1.25rem;
   padding: 10px 20px;
   border: none;
@@ -89,7 +91,7 @@ const Button = styled.button`
 
 const Tittle = styled.h1`
   font-size: 2.5rem;
-  color: #333;
+  color: white;
   text-align: center;
 
   @media (max-width: 768px) {
@@ -103,7 +105,7 @@ const Tittle = styled.h1`
 
 const InformationMessage = styled.div`
   font-size: 1.25rem;
-  color: #666;
+  color: white;
   margin: 20px;
   text-align: center;
 
