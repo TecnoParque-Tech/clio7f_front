@@ -69,30 +69,8 @@ const PersonalInformation = () => {
   return (
     <FormContainer>
       <Content>
-        <Tittle>Información Personal</Tittle>
+        <Tittle>Información</Tittle>
         <form>
-          <FormField>
-            <Label htmlFor="firstName">Nombres</Label>
-            <Input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <Label htmlFor="lastName">Apellidos</Label>
-            <Input
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
           <FormField>
             <Label htmlFor="email">Correo</Label>
             <Input
@@ -100,28 +78,6 @@ const PersonalInformation = () => {
               id="email"
               name="email"
               value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <Label htmlFor="phone">Celular</Label>
-            <Input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
-            <Input
-              type="date"
-              id="birthDate"
-              name="birthDate"
-              value={formData.birthDate}
               onChange={handleChange}
               required
             />
@@ -163,9 +119,12 @@ const Content = styled.div`
 `;
 
 const FormField = styled.div`
+  display: flex;
+  flex-direction: column;
   margin-bottom: 15px;
   color: white;
   width: 100%;
+  align-items: center;
 `;
 
 const Label = styled.label`
