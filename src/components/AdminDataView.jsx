@@ -49,11 +49,8 @@ const AdminDataView = () => {
     // Mapeo de campos sociodemográficos
     const demographicMapping = {
       companyNIT: "NIT de la empresa",
-      firstName: "Nombres",
-      lastName: "Apellidos",
       email: "Correo electrónico",
-      phone: "Teléfono",
-      birthDate: "Fecha de nacimiento",
+      timestamp: "Fecha de Diligenciamiento",
       "Género:": "Género",
       "Estado Civil:": "Estado civil",
       "Indique su edad de acuerdo a los siguientes rangos": "Rango de edad",
