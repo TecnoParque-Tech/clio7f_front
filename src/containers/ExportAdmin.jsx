@@ -19,10 +19,9 @@ const ExportAdmin = ({ onLogout }) => {
   };
 
   const exportToExcel = () => {
-    const flatData = data.map(entry => {
+    const flatData = data.map((entry) => {
       const { id, timestamp, companyNIT, responses } = entry;
 
-      // Si no hay responses, mostrar advertencia
       if (!responses || typeof responses !== "object") {
         console.warn(`⚠️ Entrada sin responses válidas:`, entry);
         return {
@@ -33,29 +32,37 @@ const ExportAdmin = ({ onLogout }) => {
         };
       }
 
-      const {
-        firstName = "N/A",
-        lastName = "N/A",
-        email = "N/A",
-        phone = "N/A",
-        birthDate = "N/A",
-        ...restOfResponses
-      } = responses;
+      // Filtrar cualquier clave que contenga palabras asociadas a datos personales
+      const filteredResponses = Object.entries(responses)
+        .filter(([key]) => {
+          const lowerKey = key.toLowerCase();
+          return !(
+            lowerKey.includes("first") ||
+            lowerKey.includes("last") ||
+            lowerKey.includes("nombre") ||
+            lowerKey.includes("apellido") ||
+            lowerKey.includes("correo") ||
+            lowerKey.includes("email") ||
+            lowerKey.includes("phone") ||
+            lowerKey.includes("tel") ||
+            lowerKey.includes("nacimiento") ||
+            lowerKey.includes("birth")
+          );
+        })
+        .reduce((obj, [key, value]) => {
+          obj[key] = value;
+          return obj;
+        }, {});
 
       return {
         ID: id,
-        Nombre: firstName,
-        Apellido: lastName,
-        Correo: email,
-        Teléfono: phone,
-        FechaNacimiento: birthDate,
         NIT: companyNIT || "N/A",
         Fecha: timestamp || "N/A",
-        ...restOfResponses,
+        ...filteredResponses,
       };
     });
 
-    console.log("🧾 Datos planos para exportar:", flatData);
+    console.log("🧾 Datos filtrados para exportar (sin datos personales):", flatData);
 
     const worksheet = XLSX.utils.json_to_sheet(flatData);
     const workbook = XLSX.utils.book_new();

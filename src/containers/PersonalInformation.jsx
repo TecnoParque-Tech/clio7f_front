@@ -11,11 +11,7 @@ const PersonalInformation = () => {
   const storedData = JSON.parse(localStorage.getItem('surveyResponses')) || {};
 
   const [formData, setFormData] = useState({
-    firstName: storedData.firstName || '',
-    lastName: storedData.lastName || '',
     email: storedData.email || '',
-    phone: storedData.phone || '',
-    birthDate: storedData.birthDate || '',
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -26,11 +22,8 @@ const PersonalInformation = () => {
 
   const validateForm = (data) => {
     return (
-      data.firstName.trim() !== '' &&
-      data.lastName.trim() !== '' &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) &&
-      /^[0-9]+$/.test(data.phone) &&
-      data.birthDate.trim() !== ''
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)
+      
     );
   };
 
