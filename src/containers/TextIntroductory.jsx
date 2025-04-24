@@ -1,9 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import rightArrow from "../assets/right-arrow.png";
 
 const Presentation = () => {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <Content>
@@ -44,10 +46,8 @@ const Presentation = () => {
           <p>¡Saludos y muchos éxitos!</p>
         </InformationMessage>
       </Content>
-      <Button>
-        <StyledLink to={"/presentation"}>
-          <img src={rightArrow} alt="Right Arrow" />
-        </StyledLink>
+      <Button onClick={() => navigate("/informedConsent")}>
+        <img src={rightArrow} alt="Continuar" />
       </Button>
     </Container>
   );
@@ -155,9 +155,4 @@ const Button = styled.button`
     font-size: 0.875rem;
     padding: 5px 10px;
   }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
 `;
