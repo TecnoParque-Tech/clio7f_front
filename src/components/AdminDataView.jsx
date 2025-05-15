@@ -98,7 +98,7 @@ const AdminDataView = () => {
     ];
   
     // Agregar columna de promedio por sección
-    const sectionAverages = sectionOrder.map(section => `Promedio - ${section}`);
+    const sectionAverages = sectionOrder.map(section => `Suma - ${section}`);
     const fullHeaders = [...headers, ...sectionAverages];
   
     // Agregar encabezados
@@ -129,13 +129,13 @@ const AdminDataView = () => {
         }
       });
   
-      // Calcular promedios
+      // Calcular sumas
       sectionOrder.forEach(section => {
         const values = headers.filter(h => h.startsWith(section))
           .map(k => entry.responses?.[k])
           .filter(v => typeof v === 'number');
-        const avg = values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : '';
-        row.push(avg);
+        const sum = values.length ? values.reduce((a, b) => a + b, 0) : '';
+        row.push(sum);
       });
   
       worksheet.addRow(row);
