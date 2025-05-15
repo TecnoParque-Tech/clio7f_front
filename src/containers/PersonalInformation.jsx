@@ -62,7 +62,7 @@ const PersonalInformation = () => {
   return (
     <FormContainer>
       <Content>
-        <Tittle>Información Personal</Tittle>
+        <Tittle>Información</Tittle>
         <form>
           <FormField>
             <Label htmlFor="email">Correo</Label>
